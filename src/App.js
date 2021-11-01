@@ -1,25 +1,47 @@
-import logo from './logo.svg';
+import React, { Component } from 'react';
+
+import { CardList } from './components/card-list/card-list.component';
+import { SearchBox } from './components/search-box/search-box.component';
+
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  constructor() {
+    super();
+
+    this.state = {
+      localUsers: [],
+      searchTerm: ''
+    }
+  }
+
+  componentDidMount() {
+    fetch('https://jsonplaceholder.typicode.com/users')
+    .then(response => response.json())
+    .then(users => this.setState({localUsers: users})); // we're binding our local state property to the response object received
+  }
+
+  handleChange = (e) => {
+    this.setState({searchTerm: e.target.value})
+  }
+
+  render() {
+    const { localUsers, searchTerm } = this.state;
+    const filteredUsers = localUsers.filter(localUser =>
+      localUser.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      return (
+      <div className="App">
+        <h1>Users Rolodex</h1>
+        <SearchBox
+          placeholder='search users...'
+          handleChange={this.handleChange}
+        />
+        <CardList localUsers = { filteredUsers }></CardList>
+      </div>
+    );
+  }
 }
 
 export default App;
